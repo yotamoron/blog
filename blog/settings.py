@@ -107,6 +107,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     "/home/yotam/sites/blog/auth/templates",
+    "/home/yotam/sites/blog/templates",
 )
 
 INSTALLED_APPS = (

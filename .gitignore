@@ -27,4 +27,6 @@ pip-log.txt
 .mr.developer.cfg
 
 # gvim
-.sw[po]
+*.swp
+*.swo
+tags
