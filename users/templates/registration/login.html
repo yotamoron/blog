@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block mainbody %}
+
+<form action="/accounts/login/?next={{ next }}" method="post">{% csrf_token %}
+	<div>
+	    {% if form.errors %}
+            <p><b>Your username and password didn't match. Please try again.</b></p>
+	    {% endif %}
+	    <div> 
+	        <span>Please sign in with your existing login.</span>
+	        <br>
+	    </div>
+	    <div>
+	        <h1><span><strong>Username</strong></span></h1>
+	 		{{ form.username }}
+	        <br>
+	        <br>
+	        <h1><span><strong>Password</strong></span></h1>
+	        {{ form.password }}
+	        <br>
+	        <br>
+	
+	        <div id="rememberBox">
+                {{ form.remember_me }}
+                <label for="remember_me">Remember me</label>
+                <input type="hidden" name="next" value="{{ next }}" />
+            </div>
+            <input type="Submit" value"Login">
+            <div> 
+                <a href="/accounts/password/reset/">Forgot your password?</a>
+            </div>
+            <div>
+                <a href="/accounts/register/">Free sign-up</a>
+            </div>
+        </div>
+	</div>
+</form>
+{% endblock  %}

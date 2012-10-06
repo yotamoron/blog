@@ -106,7 +106,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/home/yotam/sites/blog/auth/templates",
+    "/home/yotam/sites/blog/users/templates",
     "/home/yotam/sites/blog/templates",
 )
 
@@ -118,11 +118,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'registration',
-    "widget_tweaks",
+    #'widget_tweaks',
+    'main'
 )
 
 # A sample logging configuration. The only tangible logging
@@ -161,3 +162,5 @@ EMAIL_HOST_PASSWORD = ""
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'testing@example.com'
 
+ACCOUNT_ACTIVATION_DAYS = 3
+LOGIN_REDIRECT_URL = "/index/"
