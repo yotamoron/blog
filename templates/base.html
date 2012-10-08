@@ -12,14 +12,15 @@
                         <div id="header-wrapper" class="container">
                                 <div id="header" class="container">
                                         <div id="logo">
-                                                <h1><a href="#">Emerald </a></h1>
+                                                <h1><a href="/index/">MyBlog</a></h1>
                                         </div>
                                         <div id="menu">
                                                 <ul>
-                                                        <li class="current_page_item"><a href="#">Homepage</a></li>
-                                                        <li><a href="#">About</a></li>
+                                                        <li><a href="/index/">Homepage</a></li>
                                                         {% if request.user.is_authenticated %}
+                                                        <li><a href="/post/">Compose</a></li>
                                                         <li><a href="/accounts/logout/">Logout</a></li>
+                                                        <li><a href="/users/settings/">Settings</a></li>
                                                         {% else %}
                                                         <li><a href="/accounts/login/">Login</a></li>
                                                         <li><a href="/accounts/register/">Signup</a></li>
@@ -32,34 +33,8 @@
                         <!-- end #header -->
                         <div id="page">
                                 <div id="content">
-                                        <div class="post">
-                                                <h2 class="title"><a href="#">Welcome to Emerald </a></h2>
-                                                <p class="meta"><span class="date">August 28, 2012</span><span class="posted">Posted by <a href="#">Someone</a></span></p>
-                                                <div style="clear: both;">&nbsp;</div>
-                                                <div class="entry">
-                                                        <p>This is <strong>Emerald </strong>, a free, fully standards-compliant CSS template designed by <a href="http://www.freecsstemplates.org">FCT</a>.  This free template is released under a <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0</a> license, so you’re pretty much free to do whatever you want with it (even use it commercially) provided you keep the links in the footer intact. Aside from that, have fun with it :)</p>
-                                                        <p>Sed lacus. Donec lectus. Nullam pretium nibh ut turpis. Nam bibendum. In nulla tortor, elementum ipsum. Proin imperdiet est. Phasellus dapibus semper urna. Pellentesque ornare, orci in felis. Donec ut ante. In id eros. Suspendisse lacus turpis, cursus egestas at sem.</p>
-                                                        <p class="links"><a href="#" class="more">Read More</a><a href="#" title="b0x" class="comments">Comments</a></p>
-                                                </div>
-                                        </div>
-                                        <div class="post">
-                                                <h2 class="title"><a href="#">Lorem ipsum sed aliquam</a></h2>
-                                                <p class="meta"><span class="date">August 20, 2012</span><span class="posted">Posted by <a href="#">Someone</a></span></p>
-                                                <div style="clear: both;">&nbsp;</div>
-                                                <div class="entry">
-                                                        <p>Sed lacus. Donec lectus. Nullam pretium nibh ut turpis. Nam bibendum. In nulla tortor, elementum vel, tempor at, varius non, purus. Mauris vitae nisl nec metus placerat consectetuer. Donec ipsum. Proin imperdiet est. Phasellus <a href="#">dapibus semper urna</a>. Pellentesque ornare, orci in consectetuer hendrerit, urna elit eleifend nunc, ut consectetuer nisl felis ac diam. Etiam non felis. Donec ut ante. In id eros. Suspendisse lacus turpis, cursus egestas at sem.  Mauris quam enim, molestie in, rhoncus ut, lobortis a, est.</p>
-                                                        <p class="links"><a href="#" class="more">Read More</a><a href="#" title="b0x" class="comments">Comments</a></p>
-                                                </div>
-                                        </div>
-                                        <div class="post">
-                                                <h2 class="title"><a href="#">Consecteteur hendrerit </a></h2>
-                                                <p class="meta"><span class="date">August 10, 2012</span><span class="posted">Posted by <a href="#">Someone</a></span></p>
-                                                <div style="clear: both;">&nbsp;</div>
-                                                <div class="entry">
-                                                        <p>Sed lacus. Donec lectus. Nullam pretium nibh ut turpis. Nam bibendum. In nulla tortor, elementum vel, tempor at, varius non, purus. Mauris vitae nisl nec metus placerat consectetuer. Donec ipsum. Proin imperdiet est. Phasellus <a href="#">dapibus semper urna</a>. Pellentesque ornare, orci in consectetuer hendrerit, urna elit eleifend nunc, ut consectetuer nisl felis ac diam. Etiam non felis. Donec ut ante. In id eros. Suspendisse lacus turpis, cursus egestas at sem.  Mauris quam enim, molestie in, rhoncus ut, lobortis a, est.</p>
-                                                        <p class="links"><a href="#" class="more">Read More</a><a href="#" title="b0x" class="comments">Comments</a></p>
-                                                </div>
-                                        </div>
+                                        {% block content %} {% endblock %}
+                                        <!-- See index.html for more info -->
                                         <div style="clear: both;">&nbsp;</div>
                                 </div>
                                 <!-- end #content -->
@@ -76,43 +51,18 @@
                                                 </div>
                                                 <div style="clear: both;">&nbsp;</div>
                                                 </li>
+                                                {% block sidebar %}
+                                                {% for cat, links in sidebar.links.items %}
+
                                                 <li>
-                                                <h2>Aliquam tempus</h2>
-                                                <p>Mauris vitae nisl nec metus placerat perdiet est. Phasellus dapibus semper consectetuer hendrerit.</p>
-                                                </li>
-                                                <li>
-                                                <h2>Categories</h2>
+                                                <h2>{{ cat }}</h2>
                                                 <ul>
-                                                        <li><a href="#">Aliquam libero</a></li>
-                                                        <li><a href="#">Consectetuer adipiscing elit</a></li>
-                                                        <li><a href="#">Metus aliquam pellentesque</a></li>
-                                                        <li><a href="#">Suspendisse iaculis mauris</a></li>
-                                                        <li><a href="#">Urnanet non molestie semper</a></li>
-                                                        <li><a href="#">Proin gravida orci porttitor</a></li>
+                                                        {% for link in links %}
+                                                        <li><a href="{{ link.url }}">{{ link.name }}</a></li>
+                                                        {% endfor %}
                                                 </ul>
                                                 </li>
-                                                <li>
-                                                <h2>Blogroll</h2>
-                                                <ul>
-                                                        <li><a href="#">Aliquam libero</a></li>
-                                                        <li><a href="#">Consectetuer adipiscing elit</a></li>
-                                                        <li><a href="#">Metus aliquam pellentesque</a></li>
-                                                        <li><a href="#">Suspendisse iaculis mauris</a></li>
-                                                        <li><a href="#">Urnanet non molestie semper</a></li>
-                                                        <li><a href="#">Proin gravida orci porttitor</a></li>
-                                                </ul>
-                                                </li>
-                                                <li>
-                                                <h2>Archives</h2>
-                                                <ul>
-                                                        <li><a href="#">Aliquam libero</a></li>
-                                                        <li><a href="#">Consectetuer adipiscing elit</a></li>
-                                                        <li><a href="#">Metus aliquam pellentesque</a></li>
-                                                        <li><a href="#">Suspendisse iaculis mauris</a></li>
-                                                        <li><a href="#">Urnanet non molestie semper</a></li>
-                                                        <li><a href="#">Proin gravida orci porttitor</a></li>
-                                                </ul>
-                                                </li>
+                                                {% endfor %} {% endblock %}
                                         </ul>
                                 </div>
                                 <!-- end #sidebar -->
