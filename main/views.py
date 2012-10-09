@@ -24,14 +24,21 @@ class Sidebar(object):
                         self.links[cat] = []
                 self.links[cat] += [{'url':url, 'name':name}]
 
-def shorten_post(posts):
-        for post in posts:
-                if len(post.post) > 200:
-                        last = 200
-                        while not post.post[last] == ' ':
-                                last -= 1
-                        post.post = post.post[0:last] + ' ...'
-        return posts
+class PostForm(ModelForm):
+        class Meta:
+                model = Post
+                fields = ('subject', 'post',)
+
+def message(request, msg):
+        return render_to_response(request, 'message.html',
+                        {'message':msg},
+                         context_instance=RequestContext(request))
+
+def get_post_by_id(request, post_id):
+        try:
+                return Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+                return None
 
 def index(request, username):
         if username:
@@ -39,78 +46,68 @@ def index(request, username):
         else:
                 posts = Post.objects.all()
 
-        # Need to shorten the post to 200 chars
-        posts = shorten_post(posts).order_by("-posted_at")
+        posts = posts.order_by("-posted_at")
+        for p in posts:
+                p.shorten_post()
+
         return render_to_response(request, 'index.html', {'posts':posts})
 
-class PostForm(ModelForm):
-        class Meta:
-                model = Post
-                fields = ('subject', 'post',)
-
-def can_edit(req, post):
-        return req.user.id == post.user.id
-
 def view(request, post_id):
-        if post_id:
-                try:
-                        post_by_id = Post.objects.get(id=post_id)
-                except Post.DoesNotExist:
-                        return render_to_response(request, 'message.html',
-                                        {'message':"The post you asked for doesn't exist"},
-                                         context_instance=RequestContext(request))
-        post = Post.objects.get(id=post_id)
-        if can_edit(request, post_by_id):
-                post.edit_url = reverse('main.views.post',
-                                        args=(str(post_id) + '/edit',))
-        return render_to_response(request, 'index.html', {'posts':[post]},
+        the_post = get_post_by_id(request, post_id)
+        if not the_post:
+                return message(request, "The post you asked for doesn't exist")
+        the_post.can_edit = request.user.has_object_perm(the_post, 'edit')
+        return render_to_response(request, 'index.html', {'posts':[the_post]},
                           context_instance=RequestContext(request))
+
+@login_required
+def delete(request, post_id):
+        the_post = get_post_by_id(request, post_id)
+        if not the_post:
+                msg = "The post you asked for doesn't exist"
+        if request.user.has_object_perm(the_post, 'delete'):
+                the_post.delete()
+                msg = "You post \"%s\" has been deleted" % the_post.subject
+        else:
+                msg = "You have no permissions to delete this post"
+        return message(request, msg)
 
 @login_required
 def post(request, post_id, action):
 
+        is_edit = action == 'edit'
+        the_post = None
         if post_id:
-                try:
-                        post_by_id = Post.objects.get(id=post_id)
-                except Post.DoesNotExist:
-                        return render_to_response(request, 'message.html',
-                                        {'message':"The post you asked for doesn't exist"},
-                                         context_instance=RequestContext(request))
-        if action == 'edit' and not can_edit(request, post_by_id):
-                return render_to_response(request, 'message.html',
-                                {'message':"You have no permissions to edit \
-                                                this post"},
-                                context_instance=RequestContext(request))
+                the_post = get_post_by_id(request, post_id)
+                if not the_post:
+                        return message(request,
+                                        "The post you asked for doesn't exist")
 
-        if action == 'edit':
-                post_url = reverse('main.views.post',
-                                args=(str(post_id) + '/edit',))
-        else:
-                post_url = reverse('main.views.post')
+        if is_edit and not request.user.has_object_perm(the_post, 'edit'):
+                return message(request,
+                                "You have no permissions to edit this post")
+
         if request.method == "POST":
-                if action == 'edit':
-                        post = post_by_id
-                else:
-                        post = Post()
-                        post.user_id = request.user.id
-                        post.posted_at = datetime.datetime.utcnow()
-                form = PostForm(request.POST, instance=post)
+                if not is_edit:
+                        the_post = Post()
+                        the_post.user_id = request.user.id
+                        the_post.posted_at = datetime.datetime.utcnow()
+                form = PostForm(request.POST, instance=the_post)
                 if form.is_valid():
                         form.save()
+                        request.user.grant_object_perm(the_post,
+                                        ['edit', 'delete'])
                         return HttpResponseRedirect(reverse('main.views.index',
                                 args=(request.user.username,)))
                 else:
-                        error = 'Form did not validate'
                         return render_to_response(request, 'post.html',
-                                        {'form':form,
-                                         'post_url':post_url},
+                                        {'form':form},
                                         context_instance=RequestContext(request))
         else:
-                if action == 'edit':
-                        form = PostForm(instance=post_by_id)
-                else:
-                        form = PostForm()
-                return render_to_response(request, 'post.html',
-                                {'form':form, 'post_url':post_url},
+                instance = None
+                if is_edit:
+                        instance = the_post
+                form = PostForm(instance=instance)
+                return render_to_response(request, 'post.html', {'form':form},
                                  context_instance=RequestContext(request))
 

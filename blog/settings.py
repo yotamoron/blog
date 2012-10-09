@@ -128,7 +128,8 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'registration',
     #'widget_tweaks',
-    'main'
+    'main',
+    'objectpermissions'
 )
 
 # A sample logging configuration. The only tangible logging

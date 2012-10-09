@@ -16,8 +16,8 @@
                                         </div>
                                         <div id="menu">
                                                 <ul>
-                                                        <li><a href="/index/">Homepage</a></li>
                                                         {% if request.user.is_authenticated %}
+                                                        <li><a href="/index/{{ request.user.username }}">Home::{{ request.user.username }}</a></li>
                                                         <li><a href="/post/">Compose</a></li>
                                                         <li><a href="/accounts/logout/">Logout</a></li>
                                                         <li><a href="/users/settings/">Settings</a></li>

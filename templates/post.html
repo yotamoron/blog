@@ -2,7 +2,7 @@
 
 {% block content %}
 {{ form.non_fields_erros }}
-<form action="{{ post_url }}" method="POST">
+<form method="POST">
 {% csrf_token %}
 {{ form.as_p }}
 <input type="Submit" value="Submit">

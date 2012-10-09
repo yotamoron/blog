@@ -19,5 +19,6 @@ urlpatterns = patterns('',
     url(r'^users/settings/$', 'users.views.settings'),
     url(r'^index/(?P<username>\w+)?/?$', 'main.views.index'),
     url(r'^view/(?P<post_id>\d+)/?$', 'main.views.view'),
+    url(r'^delete/(?P<post_id>\d+)/?$', 'main.views.delete'),
     url(r'^post/(?P<post_id>\d+)?/?(?P<action>\w+)?/?$', 'main.views.post'),
 )
