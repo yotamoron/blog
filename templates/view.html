@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="content">
+{% if post %}
+        <div class="post">
+                <h2 class="title"><a href="/view/{{ post.id }}/">{{ post.subject }}</a></h2>
+                <p class="meta">
+                <span class="date">{{ post.posted_at }}</span>
+                <span class="posted">Posted by <a href="/index/{{ post.user.username }}/">{{ post.user.username }}</a>
+                        </span>
+                </p>
+                <div style="clear: both;">&nbsp;</div>
+                <div class="entry">{{ post.post }}
+                        <p class="links">
+                        {% if comment_form %}
+                        <a href="/post/{{ post.id }}/edit" class="more">Edit</a>
+                        <a href="/delete/{{ post.id }}/" class="more">Delete</a>
+                        {% endif %}
+                        </p>
+                </div>
+        </div>
+        <hr>
+        <h1>Comments</h1>
+        <div style="clear: both;">&nbsp;</div>
+        {% if comments %}
+                {% for comment in comments %}
+                        <b>{{ comment.subject }}</b>
+                        <p class="meta">
+                        <span class="posted">Posted by &nbsp;<u><a href="/index/{{ comment.user.username }}/">{{ comment.user.username }}</a></u> on &nbsp;
+                                <span class="date">{{ comment.posted_at }}</span>
+                                </span>
+                        </p>
+                        <div style="clear: both;">&nbsp;</div>
+                        <div class="entry">{{ comment.comment }} </div>
+                        <div style="clear: both;">&nbsp;</div>
+                        <hr>
+                {% endfor %}
+        {% else %}
+        No comments
+        {% endif %}
+        <div style="clear: both;">&nbsp;</div>
+        {% if comment_form %}
+        Post your comment:
+                <form method="POST">
+                        {% csrf_token %}
+                        {{ comment_form.as_p }}
+                        <input type="Submit" value="Submit">
+                </form>
+        {% else %}
+        <u><a href="/accounts/login/?next=/view/{{ post.id }}/">Login</a></u> to add your comments
+        {% endif %}
+{% else %}
+No posts found
+{% endif %}
+</div>
+{% endblock %}

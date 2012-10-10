@@ -10,7 +10,6 @@ class Post(models.Model):
         subject = models.CharField('Subject', max_length=128)
         post = models.TextField('')
         posted_at = models.DateTimeField("Posted at", auto_now=True)
-        edited_at = models.DateTimeField("Last edited at", auto_now=True)
 
         def shorten_post(self):
                 if len(self.post) > 200:
@@ -21,8 +20,8 @@ class Post(models.Model):
 
 # Comment
 class Comment(models.Model):
-        post = models.ForeignKey(Post)
-        posted_by = models.IntegerField()
+        user = models.ForeignKey(User)
+        on_post = models.ForeignKey(Post)
         subject = models.CharField(max_length=128)
         comment = models.TextField()
         posted_at = models.DateTimeField("Posted at", auto_now=True)

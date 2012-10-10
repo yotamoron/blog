@@ -2,7 +2,7 @@
 from main.render import render_to_response
 from django.contrib.auth.models import User
 from django.template import RequestContext
-from main.models import Post
+from main.models import Post, Comment
 from django.contrib.auth.decorators import login_required
 from django.forms import ModelForm
 from django.http import HttpResponseRedirect
@@ -28,6 +28,11 @@ class PostForm(ModelForm):
         class Meta:
                 model = Post
                 fields = ('subject', 'post',)
+
+class CommentForm(ModelForm):
+        class Meta:
+                model = Comment
+                fields = ('subject', 'comment',)
 
 def message(request, msg):
         return render_to_response(request, 'message.html',
@@ -56,9 +61,21 @@ def view(request, post_id):
         the_post = get_post_by_id(request, post_id)
         if not the_post:
                 return message(request, "The post you asked for doesn't exist")
-        the_post.can_edit = request.user.has_object_perm(the_post, 'edit')
-        return render_to_response(request, 'index.html', {'posts':[the_post]},
-                          context_instance=RequestContext(request))
+        if request.method == "POST":
+                the_comment = Comment()
+                the_comment.on_post_id = the_post.id
+                the_comment.user_id = request.user.id
+                form = CommentForm(request.POST, instance=the_comment)
+                if form.is_valid():
+                        form.save()
+                        return HttpResponseRedirect(reverse('main.views.view',
+                                args=(post_id,)))
+        comments = Comment.objects.filter(on_post__id=the_post.id).order_by('posted_at')
+        d = {'post':the_post, 'comments':comments}
+        if request.user.is_authenticated():
+                d['comment_form'] = CommentForm()
+        return render_to_response(request, 'view.html', d,
+                        context_instance=RequestContext(request))
 
 @login_required
 def delete(request, post_id):
