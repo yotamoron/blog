@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 import datetime
 
 MOST_VIEWED = 'Most Viewed'
+ARCHIVE = 'Archive'
 
 class PostForm(ModelForm):
         class Meta:
@@ -32,22 +33,39 @@ def get_post_by_id(post_id):
         except Post.DoesNotExist:
                 return None
 
-def index(request, username):
+def index(request, username, year, month):
         if username:
                 posts = Post.objects.filter(user__username=username)
         else:
                 posts = Post.objects.all()
 
         posts = posts.order_by("-posted_at")
+        archive = {}
+        years_in_db = Post.objects.dates('posted_at', 'year').order_by('-posted_at')
+        for y in years_in_db:
+                months_in_year = Post.objects.filter(posted_at__year=y.year).dates('posted_at', 'month')
+                archive[y.year] = months_in_year
+
+        if year:
+                posts = posts.filter(posted_at__year=year)
+        if month:
+                posts = posts.filter(posted_at__month=month)
         most_viewed = posts.order_by("-views")[0:5]
+        if year and month:
+                pass
         for p in posts:
                 p.shorten_post()
-        sb = {}
+        sb = {MOST_VIEWED:[]}
         for mv in most_viewed:
-                if not sb.has_key(MOST_VIEWED):
-                        sb[MOST_VIEWED] = []
                 sb[MOST_VIEWED] += [{'url':'/view/%s/' % mv.id,
                         'name':mv.subject}]
+        if username:
+                sb[ARCHIVE] = []
+                for _year, _months in archive.items():
+                        for _m in _months:
+                                url = '/index/%s/%d/%d/' % (username, _year, _m.month)
+                                sb[ARCHIVE] += [{'url': url,
+                                        'name':'%d/%d' % (_m.month, _year)}]
 
         return render_to_response(request, 'index.html', {'posts':posts,
                 'sidebar':sb})
