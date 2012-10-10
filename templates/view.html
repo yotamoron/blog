@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% block head %}
+{% if comment_form %}
+{{ comment_form.media }}
+{% endif %}
+{% endblock %}
+
 {% block content %}
 <div id="content">
 {% if post %}
@@ -11,7 +17,10 @@
                         </span>
                 </p>
                 <div style="clear: both;">&nbsp;</div>
-                <div class="entry">{{ post.post }}
+                <div class="entry">
+                        {% autoescape off %}
+                        {{ post.post }}
+                        {% endautoescape %}
                         <p class="links">
                         {% if comment_form %}
                         <a href="/post/{{ post.id }}/edit" class="more">Edit</a>
@@ -32,7 +41,11 @@
                                 </span>
                         </p>
                         <div style="clear: both;">&nbsp;</div>
-                        <div class="entry">{{ comment.comment }} </div>
+                        <div class="entry">
+                                {% autoescape off %}
+                                {{ comment.comment }}
+                                {% endautoescape %}
+                        </div>
                         <div style="clear: both;">&nbsp;</div>
                         <hr>
                 {% endfor %}

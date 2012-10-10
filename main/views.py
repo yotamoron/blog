@@ -21,6 +21,7 @@ class PostForm(ModelForm):
                 fields = ('subject', 'post',)
 
 class CommentForm(ModelForm):
+        comment = forms.CharField(widget=TinyMCE(attrs={'cols': 30, 'rows': 10}))
         class Meta:
                 model = Comment
                 fields = ('subject', 'comment',)
