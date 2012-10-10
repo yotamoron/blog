@@ -6,6 +6,7 @@
                 <link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
                 <link href="/static/style.css" rel="stylesheet" type="text/css" media="screen" />
                 {% block title %}{% endblock %}
+                {% block head %}{% endblock %}
         </head>
         <body>
                 <div id="wrapper">
@@ -42,7 +43,7 @@
                                         <ul>
                                                 <li>
                                                 <div id="search" >
-                                                        <form method="get" action="#">
+                                                        <form method="get" action="/search/">
                                                                 <div>
                                                                         <input type="text" name="s" id="search-text" value="" />
                                                                         <input type="submit" id="search-submit" value="GO" />

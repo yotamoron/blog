@@ -21,4 +21,6 @@ urlpatterns = patterns('',
     url(r'^view/(?P<post_id>\d+)/?$', 'main.views.view'),
     url(r'^delete/(?P<post_id>\d+)/?$', 'main.views.delete'),
     url(r'^post/(?P<post_id>\d+)?/?(?P<action>\w+)?/?$', 'main.views.post'),
+    url(r'^search/$', 'main.views.search'),
+    url(r'^tinymce/', include('tinymce.urls')),
 )

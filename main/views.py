@@ -5,14 +5,17 @@ from django.template import RequestContext
 from main.models import Post, Comment
 from django.contrib.auth.decorators import login_required
 from django.forms import ModelForm
+from django import forms
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 import datetime
+from tinymce.widgets import TinyMCE
 
 MOST_VIEWED = 'Most Viewed'
 ARCHIVE = 'Archive'
 
 class PostForm(ModelForm):
+        post = forms.CharField(widget=TinyMCE(attrs={'cols': 80, 'rows': 30}))
         class Meta:
                 model = Post
                 fields = ('subject', 'post',)
@@ -33,42 +36,45 @@ def get_post_by_id(post_id):
         except Post.DoesNotExist:
                 return None
 
-def index(request, username, year, month):
+def get_posts(username=None):
         if username:
-                posts = Post.objects.filter(user__username=username)
+                return Post.objects.filter(user__username=username)
         else:
-                posts = Post.objects.all()
+                return Post.objects.all()
 
-        posts = posts.order_by("-posted_at")
-        archive = {}
-        years_in_db = Post.objects.dates('posted_at', 'year').order_by('-posted_at')
-        for y in years_in_db:
-                months_in_year = Post.objects.filter(posted_at__year=y.year).dates('posted_at', 'month')
-                archive[y.year] = months_in_year
-
-        if year:
-                posts = posts.filter(posted_at__year=year)
-        if month:
-                posts = posts.filter(posted_at__month=month)
+def get_sidebar(posts=None, username=None):
+        if not posts:
+                posts = get_posts(username=username)
         most_viewed = posts.order_by("-views")[0:5]
-        if year and month:
-                pass
-        for p in posts:
-                p.shorten_post()
         sb = {MOST_VIEWED:[]}
         for mv in most_viewed:
                 sb[MOST_VIEWED] += [{'url':'/view/%s/' % mv.id,
                         'name':mv.subject}]
         if username:
+                archive = {}
+                years_in_db = posts.dates('posted_at', 'year')
+                for y in years_in_db:
+                        months_in_year = posts.filter(posted_at__year=y.year).dates('posted_at', 'month')
+                        archive[y.year] = months_in_year
                 sb[ARCHIVE] = []
                 for _year, _months in archive.items():
                         for _m in _months:
                                 url = '/index/%s/%d/%d/' % (username, _year, _m.month)
                                 sb[ARCHIVE] += [{'url': url,
                                         'name':'%d/%d' % (_m.month, _year)}]
+        return sb
 
+def index(request, username, year, month):
+        posts = get_posts().order_by("-posted_at")
+
+        if year:
+                posts = posts.filter(posted_at__year=year)
+        if month:
+                posts = posts.filter(posted_at__month=month)
+        for p in posts:
+                p.shorten_post()
         return render_to_response(request, 'index.html', {'posts':posts,
-                'sidebar':sb})
+                'sidebar':get_sidebar(posts=posts, username=username)})
 
 def view(request, post_id):
         the_post = get_post_by_id(post_id)
@@ -144,3 +150,7 @@ def post(request, post_id, action):
                 return render_to_response(request, 'post.html', {'form':form},
                                  context_instance=RequestContext(request))
 
+def search(request):
+        posts = Post.objects.filter(post__contains=request.GET['s']).order_by('-posted_at')
+        return render_to_response(request, 'index.html',
+                        {'posts':posts, 'sidebar':get_sidebar()})
