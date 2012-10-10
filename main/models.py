@@ -9,7 +9,8 @@ class Post(models.Model):
         user = models.ForeignKey(User)
         subject = models.CharField('Subject', max_length=128)
         post = models.TextField('')
-        posted_at = models.DateTimeField("Posted at", auto_now=True)
+        posted_at = models.DateTimeField("Posted at", auto_now=False)
+        views = models.IntegerField()
 
         def shorten_post(self):
                 if len(self.post) > 200:

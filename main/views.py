@@ -9,20 +9,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 import datetime
 
-class Sidebar(object):
-        """
-        sb = Sidebar()
-        sb.add_link('Cat1', '/index/blabla1/', 'Blabla1')
-        sb.add_link('Cat1', '/index/blabla2/', 'Blabla2')
-        sb.add_link('Cat2', '/index/bb1/', 'Bb1')
-        sb.add_link('Cat2', '/index/bb2/', 'Bb2')
-        """
-        links = {}
-
-        def add_link(self, cat, url, name):
-                if not self.links.has_key(cat):
-                        self.links[cat] = []
-                self.links[cat] += [{'url':url, 'name':name}]
+MOST_VIEWED = 'Most Viewed'
 
 class PostForm(ModelForm):
         class Meta:
@@ -39,7 +26,7 @@ def message(request, msg):
                         {'message':msg},
                          context_instance=RequestContext(request))
 
-def get_post_by_id(request, post_id):
+def get_post_by_id(post_id):
         try:
                 return Post.objects.get(id=post_id)
         except Post.DoesNotExist:
@@ -52,13 +39,21 @@ def index(request, username):
                 posts = Post.objects.all()
 
         posts = posts.order_by("-posted_at")
+        most_viewed = posts.order_by("-views")[0:5]
         for p in posts:
                 p.shorten_post()
+        sb = {}
+        for mv in most_viewed:
+                if not sb.has_key(MOST_VIEWED):
+                        sb[MOST_VIEWED] = []
+                sb[MOST_VIEWED] += [{'url':'/view/%s/' % mv.id,
+                        'name':mv.subject}]
 
-        return render_to_response(request, 'index.html', {'posts':posts})
+        return render_to_response(request, 'index.html', {'posts':posts,
+                'sidebar':sb})
 
 def view(request, post_id):
-        the_post = get_post_by_id(request, post_id)
+        the_post = get_post_by_id(post_id)
         if not the_post:
                 return message(request, "The post you asked for doesn't exist")
         if request.method == "POST":
@@ -74,15 +69,17 @@ def view(request, post_id):
         d = {'post':the_post, 'comments':comments}
         if request.user.is_authenticated():
                 d['comment_form'] = CommentForm()
+        the_post.views += 1
+        the_post.save()
         return render_to_response(request, 'view.html', d,
                         context_instance=RequestContext(request))
 
 @login_required
 def delete(request, post_id):
-        the_post = get_post_by_id(request, post_id)
+        the_post = get_post_by_id(post_id)
         if not the_post:
                 msg = "The post you asked for doesn't exist"
-        if request.user.has_object_perm(the_post, 'delete'):
+        elif request.user.has_object_perm(the_post, 'delete'):
                 the_post.delete()
                 msg = "You post \"%s\" has been deleted" % the_post.subject
         else:
@@ -95,7 +92,7 @@ def post(request, post_id, action):
         is_edit = action == 'edit'
         the_post = None
         if post_id:
-                the_post = get_post_by_id(request, post_id)
+                the_post = get_post_by_id(post_id)
                 if not the_post:
                         return message(request,
                                         "The post you asked for doesn't exist")
@@ -109,6 +106,7 @@ def post(request, post_id, action):
                         the_post = Post()
                         the_post.user_id = request.user.id
                         the_post.posted_at = datetime.datetime.utcnow()
+                        the_post.views = 0
                 form = PostForm(request.POST, instance=the_post)
                 if form.is_valid():
                         form.save()
