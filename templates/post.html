@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block content %}
-{{ form.non_fields_erros }}
 <form method="POST">
+{{ form.non_fields_erros }}
 {% csrf_token %}
 {{ form.as_p }}
 <input type="Submit" value="Submit">

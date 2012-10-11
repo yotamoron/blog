@@ -62,7 +62,7 @@ def get_sidebar(posts=None, username=None):
                 sb[ARCHIVE] = []
                 for _year, _months in archive.items():
                         for _m in _months:
-                                url = '/%s/%d/%d/' % (username, _year, _m.month)
+                                url = '/index/%s/%d/%d/' % (username, _year, _m.month)
                                 sb[ARCHIVE] += [{'url': url,
                                         'name':'%d/%d' % (_m.month, _year)}]
         return sb

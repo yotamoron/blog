@@ -4,7 +4,7 @@ import os
 
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/../"
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -71,7 +71,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    PROJECT_PATH + "/static/",
+    PROJECT_PATH + '/static/',
 )
 
 # List of finder classes that know how to find static files in
@@ -170,6 +170,6 @@ EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 ACCOUNT_ACTIVATION_DAYS = 3
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/index/"
 
 ITEMS_PER_PAGE = 2

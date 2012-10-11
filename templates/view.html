@@ -13,7 +13,7 @@
                 <h2 class="title"><a href="/view/{{ post.id }}/">{{ post.subject }}</a></h2>
                 <p class="meta">
                 <span class="date">{{ post.posted_at }}</span>
-                <span class="posted">Posted by <a href="/{{ post.user.username }}/">{{ post.user.username }}</a>
+                <span class="posted">Posted by <a href="/index/{{ post.user.username }}/">{{ post.user.username }}</a>
                         </span>
                 </p>
                 <div style="clear: both;">&nbsp;</div>
@@ -36,7 +36,7 @@
                 {% for comment in comments %}
                         <b>{{ comment.subject }}</b>
                         <p class="meta">
-                        <span class="posted">Posted by &nbsp;<u><a href="/{{ comment.user.username }}/">{{ comment.user.username }}</a></u> on &nbsp;
+                        <span class="posted">Posted by &nbsp;<u><a href="/index/{{ comment.user.username }}/">{{ comment.user.username }}</a></u> on &nbsp;
                                 <span class="date">{{ comment.posted_at }}</span>
                                 </span>
                         </p>

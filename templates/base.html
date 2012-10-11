@@ -13,12 +13,12 @@
                         <div id="header-wrapper" class="container">
                                 <div id="header" class="container">
                                         <div id="logo">
-                                                <h1><a href="/">MyBlog</a></h1>
+                                                <h1><a href="/index/">MyBlog</a></h1>
                                         </div>
                                         <div id="menu">
                                                 <ul>
                                                         {% if request.user.is_authenticated %}
-                                                        <li><a href="/{{ request.user.username }}">Home::{{ request.user.username }}</a></li>
+                                                        <li><a href="/index/{{ request.user.username }}">Home::{{ request.user.username }}</a></li>
                                                         <li><a href="/post/">Compose</a></li>
                                                         <li><a href="/accounts/logout/">Logout</a></li>
                                                         {% else %}
