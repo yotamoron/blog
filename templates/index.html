@@ -8,7 +8,7 @@
                 <h2 class="title"><a href="/view/{{ post.id }}/">{{ post.subject }}</a></h2>
                 <p class="meta">
                 <span class="date">{{ post.posted_at }}</span>
-                <span class="posted">Posted by <a href="/index/{{ post.user.username }}/">{{ post.user.username }}</a>
+                <span class="posted">Posted by <a href="/{{ post.user.username }}/">{{ post.user.username }}</a>
                         </span>
                 </p>
                 <div style="clear: both;">&nbsp;</div>
@@ -18,6 +18,12 @@
                 </div>
         </div>
         {% endfor %}
+        {% if paging %}
+        <u><a href="{{ request.path }}?p={{ paging.first }}">&lt;&lt;</a></u>
+        <u><a href="{{ request.path }}?p={{ paging.prev }}">&lt;</a></u>
+        <u><a href="{{ request.path }}?p={{ paging.next }}">&gt;</a></u>
+        <u><a href="{{ request.path }}?p={{ paging.last }}">&gt;&gt;</a></u>
+        {% endif %}
 </div>
 {% else %}
 No posts found

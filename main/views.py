@@ -10,6 +10,8 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 import datetime
 from tinymce.widgets import TinyMCE
+from django.core.paginator import Paginator
+from django.conf import settings
 
 MOST_VIEWED = 'Most Viewed'
 ARCHIVE = 'Archive'
@@ -60,13 +62,13 @@ def get_sidebar(posts=None, username=None):
                 sb[ARCHIVE] = []
                 for _year, _months in archive.items():
                         for _m in _months:
-                                url = '/index/%s/%d/%d/' % (username, _year, _m.month)
+                                url = '/%s/%d/%d/' % (username, _year, _m.month)
                                 sb[ARCHIVE] += [{'url': url,
                                         'name':'%d/%d' % (_m.month, _year)}]
         return sb
 
 def index(request, username, year, month):
-        posts = get_posts().order_by("-posted_at")
+        posts = get_posts(username=username).order_by("-posted_at")
 
         if year:
                 posts = posts.filter(posted_at__year=year)
@@ -74,8 +76,34 @@ def index(request, username, year, month):
                 posts = posts.filter(posted_at__month=month)
         for p in posts:
                 p.shorten_post()
-        return render_to_response(request, 'index.html', {'posts':posts,
-                'sidebar':get_sidebar(posts=posts, username=username)})
+        pages = Paginator(posts, settings.ITEMS_PER_PAGE)
+        if request.GET.has_key('p'):
+                try:
+                        curr_page = int(request.GET['p'])
+                except ValueError:
+                        curr_page = 1
+
+                if curr_page > pages.num_pages:
+                        curr_page = pages.num_pages
+                elif curr_page < 1:
+                        curr_page = 1
+        else:
+                curr_page = 1
+        d = {'posts':pages.page(curr_page),
+             'sidebar':get_sidebar(posts=posts, username=username)}
+        if pages.num_pages > 1:
+                last_page = pages.num_pages
+                first_page = 1
+                prev_page = curr_page
+                next_page = curr_page
+                if curr_page > 1:
+                        prev_page -= 1
+                if curr_page < pages.num_pages:
+                        next_page += 1
+                paging = {'first':first_page, 'last':last_page, 'next':next_page,
+                                'prev':prev_page}
+                d['paging'] = paging
+        return render_to_response(request, 'index.html', d)
 
 def view(request, post_id):
         the_post = get_post_by_id(post_id)

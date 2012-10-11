@@ -4,7 +4,7 @@ import os
 
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/../"
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -170,4 +170,6 @@ EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 ACCOUNT_ACTIVATION_DAYS = 3
-LOGIN_REDIRECT_URL = "/index/"
+LOGIN_REDIRECT_URL = "/"
+
+ITEMS_PER_PAGE = 2

@@ -13,15 +13,14 @@
                         <div id="header-wrapper" class="container">
                                 <div id="header" class="container">
                                         <div id="logo">
-                                                <h1><a href="/index/">MyBlog</a></h1>
+                                                <h1><a href="/">MyBlog</a></h1>
                                         </div>
                                         <div id="menu">
                                                 <ul>
                                                         {% if request.user.is_authenticated %}
-                                                        <li><a href="/index/{{ request.user.username }}">Home::{{ request.user.username }}</a></li>
+                                                        <li><a href="/{{ request.user.username }}">Home::{{ request.user.username }}</a></li>
                                                         <li><a href="/post/">Compose</a></li>
                                                         <li><a href="/accounts/logout/">Logout</a></li>
-                                                        <li><a href="/users/settings/">Settings</a></li>
                                                         {% else %}
                                                         <li><a href="/accounts/login/">Login</a></li>
                                                         <li><a href="/accounts/register/">Signup</a></li>
@@ -35,7 +34,6 @@
                         <div id="page">
                                 <div id="content">
                                         {% block content %} {% endblock %}
-                                        <!-- See index.html for more info -->
                                         <div style="clear: both;">&nbsp;</div>
                                 </div>
                                 <!-- end #content -->
